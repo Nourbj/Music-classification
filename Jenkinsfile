@@ -10,39 +10,19 @@ pipeline {
             }
         }
 
-        stage('Build Frontend') {
+        stage('Build with Docker Compose') {
             steps {
                 script {
-                    dir('Frontend') {
-                        bat 'docker build -t front .'
-                    }
+                    // Use Docker Compose to build all services defined in the docker-compose.yml file
+                    bat 'docker-compose build'
                 }
             }
         }
 
-        stage('Build SVM') {
+        stage('Deploy with Docker Compose') {
             steps {
                 script {
-                    dir('SVM') {
-                        bat 'docker build -t svm .'
-                    }
-                }
-            }
-        }
-
-        stage('Build vgg') {
-            steps {
-                script {
-                    dir('vgg') {
-                        bat 'docker build -t vgg19 .'
-                    }
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                script {
+                    // Use Docker Compose to bring up the containers in detached mode
                     bat 'docker-compose up -d'
                 }
             }
@@ -56,13 +36,8 @@ pipeline {
                         bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
                     }
 
-                    // Tag and push Docker images
-                    bat 'docker tag front %DOCKER_USERNAME%/frontend:latest'
-                    bat 'docker tag svm %DOCKER_USERNAME%/svm_image:latest'
-                    bat 'docker tag vgg19 %DOCKER_USERNAME%/vgg19_image:latest'
-                    bat 'docker push %DOCKER_USERNAME%/frontend:latest'
-                    bat 'docker push %DOCKER_USERNAME%/svm_image:latest'
-                    bat 'docker push %DOCKER_USERNAME%/vgg19_image:latest'
+                    // Tag and push Docker images defined in your docker-compose.yml file
+                    bat 'docker-compose push'
                 }
             }
         }
@@ -70,7 +45,7 @@ pipeline {
 
     post {
         success {
-            echo 'All images built, deployed, and pushed successfully.'
+            echo 'All services built, deployed, and pushed successfully.'
         }
         failure {
             echo 'Pipeline failed.'
