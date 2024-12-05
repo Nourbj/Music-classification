@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'windows' }
 
     stages {
 
@@ -31,12 +31,10 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 script {
-                    // Login to Docker Hub using credentials stored in Jenkins
                     withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
                     }
 
-                    // Tag and push Docker images defined in your docker-compose.yml file
                     bat 'docker-compose push'
                 }
             }
