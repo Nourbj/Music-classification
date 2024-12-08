@@ -1,52 +1,59 @@
+
 pipeline {
-    agent { label 'windows' }
+    agent any
 
     stages {
-
-        stage('Checkout') {
+        stage('Checkout Code and repository') {
             steps {
-                // Clone the repository
+                echo 'Checking out repository...'
                 git branch: 'main', url: 'https://github.com/Nourbj/Music-classification.git'
-            }
         }
 
-        stage('Build with Docker Compose') {
+        stage('Build and Start Services with Docker Compose') {
             steps {
                 script {
-                    // Use Docker Compose to build all services defined in the docker-compose.yml file
-                    bat 'docker-compose build'
+                    
+                    if (isUnix()) {
+                        sh 'docker-compose -f docker-compose.yml up --build -d'
+                    } else {
+                        bat 'docker-compose -f docker-compose.yml up --build -d'
+                    }
                 }
             }
         }
 
-        stage('Deploy with Docker Compose') {
-            steps {
-                script {
-                    // Use Docker Compose to bring up the containers in detached mode
-                    bat 'docker-compose up -d'
-                }
-            }
-        }
+        // stage('Run Tests') {
+        //     steps {
+        //         script {
+        //             // Run tests (e.g., inside the relevant service container)
+        //             if (isUnix()) {
+        //                 sh 'docker-compose exec <service_name> pytest tests/'
+        //             } else {
+        //                 bat 'docker-compose exec <service_name> pytest tests/'
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Push Docker Images') {
             steps {
                 script {
-                    withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
+                    
+                    if (isUnix()) {
+                        sh 'docker-compose push'
+                    } else {
+                        bat 'docker-compose push'
                     }
-
-                    bat 'docker-compose push'
                 }
             }
         }
-    }
 
-    post {
-        success {
-            echo 'All services built, deployed, and pushed successfully.'
-        }
-        failure {
-            echo 'Pipeline failed.'
+        stage('Deploy') {
+            steps {
+                
+                echo 'Deploying app...'
+            }
         }
     }
+}
 }
