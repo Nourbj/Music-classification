@@ -18,12 +18,26 @@ pipeline {
                         if ! command -v docker >/dev/null 2>&1; then
                             echo "Docker not installed or not in PATH"
                             exit 1
+                        else
+                            echo "Docker is installed"
+                        fi
+                        
+                        if ! docker info >/dev/null 2>&1; then
+                            echo "Docker is not running"
+                            exit 1
+                        else
+                            echo "Docker is running"
                         fi
                         '''
                     } else {
                         bat '''
                         where docker || (
                             echo Docker not installed or not in PATH
+                            exit 1
+                        )
+                        
+                        docker info || (
+                            echo Docker is not running
                             exit 1
                         )
                         '''
@@ -61,6 +75,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying the application...'
+                // Add your deployment logic here
             }
         }
     }
