@@ -2,24 +2,34 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Code and Repository') {
+        stage('Checkout Code') {
             steps {
-                echo 'Checking out repository...'
+                echo 'Checking out the code'
                 git branch: 'main', url: 'https://github.com/Nourbj/Music-classification.git'
             }
         }
 
-      
+        stage('Check Docker') {
+            steps {
+                script {
+                    echo 'Checking Docker environment...'
+                    sh '''
+                    if ! command -v docker >/dev/null 2>&1; then
+                        echo "Docker not installed or not in PATH"
+                        exit 1
+                    else
+                        echo "Docker is installed"
+                    fi
+                    '''
+                }
+            }
+        }
 
-        stage('Build and Start Services with Docker Compose') {
+        stage('Build and Start Docker Compose') {
             steps {
                 script {
                     echo 'Building and starting services with Docker Compose...'
-                    if (isUnix()) {
-                        sh 'docker-compose -f docker-compose.yml up --build -d'
-                    } else {
-                        bat 'docker-compose -f docker-compose.yml up --build -d'
-                    }
+                    sh 'docker-compose -f docker-compose.yml up --build -d'
                 }
             }
         }
@@ -27,12 +37,8 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 script {
-                    echo 'Pushing Docker images to registry...'
-                    if (isUnix()) {
-                        sh 'docker-compose push'
-                    } else {
-                        bat 'docker-compose push'
-                    }
+                    echo 'Pushing Docker images...'
+                    sh 'docker-compose push'
                 }
             }
         }
