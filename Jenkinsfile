@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout Code and repository') {
             steps {
                 echo 'Checking out repository...'
-                git branch: 'master', url: 'https://github.com/Nourbj/Music-classification.git'
+                git branch: 'main', url: 'https://github.com/Nourbj/Music-classification.git'
             }
         }
         stage('Build frontend') {
