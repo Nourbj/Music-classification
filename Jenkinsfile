@@ -6,6 +6,13 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Nourbj/Music-classification.git'
             }
         }
+        stage('Check Docker Version') {
+            steps {
+                script {
+                    bat 'docker --version'
+                }
+            }
+        }
         stage('Build Docker Images') {
             steps {
                 script {
