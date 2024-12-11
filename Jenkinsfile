@@ -2,7 +2,6 @@ pipeline {
     agent { label 'windows' }
 
     stages {
-
         stage('Checkout') {
             steps {
                 // Clone the repository
@@ -31,10 +30,12 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 script {
+                    // Authenticate Docker login using credentials stored in Jenkins
                     withCredentials([usernamePassword(credentialsId: 'docker', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
                         bat 'docker login -u %DOCKER_USERNAME% -p %DOCKER_PASSWORD%'
                     }
 
+                    // Push Docker images to the repository
                     bat 'docker-compose push'
                 }
             }
