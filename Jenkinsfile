@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'controleur' }  // Utilisation du nœud Linux "controleur"
+    agent { label 'contrôleur' }  // Utilisation du nœud Linux "controleur"
 
     stages {
         stage('Checkout Code') {
