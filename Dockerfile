@@ -17,7 +17,7 @@ COPY Models /app/Models/
 COPY requirements.txt /app/
 
 # Install Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --default-timeout=100 --no-cache-dir -r requirements.txt
 
 # Command to run the application
 CMD ["python", "main.py"]
