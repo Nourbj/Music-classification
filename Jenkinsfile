@@ -20,12 +20,13 @@ pipeline {
                 }
             }
         }
+        // Uncomment and modify if you need to stop the containers in the future
         // stage('Stop Containers') {
         //     steps {
         //         script {
         //             bat 'docker-compose down'
         //         }
         //     }
-        // }
-    }
+        // }
+    }
 }
