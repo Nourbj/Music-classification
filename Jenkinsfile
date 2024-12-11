@@ -1,4 +1,3 @@
-
 pipeline {
     agent any
 
@@ -6,44 +5,49 @@ pipeline {
         stage('Checkout Code and repository') {
             steps {
                 echo 'Checking out repository...'
-                git branch: 'main', url: 'https://github.com/Nourbj/Music-classification.git'
+                git branch: 'master', url: 'https://github.com/Nourbj/Music-classification.git'
+            }
         }
-
-        stage('Build and Start Services with Docker Compose') {
+        stage('Build frontend') {
             steps {
                 script {
-                    
-                    if (isUnix()) {
-                        sh 'docker-compose -f docker-compose.yml up --build -d'
-                    } else {
-                        bat 'docker-compose -f docker-compose.yml up --build -d'
-                    }
+                    dir('Frontend/my-angular-app')
+                        {bat 'docker build -t frontend .'}
                 }
             }
         }
 
-        // stage('Run Tests') {
-        //     steps {
-        //         script {
-        //             // Run tests (e.g., inside the relevant service container)
-        //             if (isUnix()) {
-        //                 sh 'docker-compose exec <service_name> pytest tests/'
-        //             } else {
-        //                 bat 'docker-compose exec <service_name> pytest tests/'
-        //             }
-        //         }
-        //     }
-        // }
+        stage('Build svm') {
+            steps {
+                script {
+                    dir('SVM')
+                        {bat 'docker build -t svm .'}
+                }
+            }
+        }
+        stage('Build vgg') {
+            steps {
+                script {
+                    dir('vgg')
+                        {bat 'docker build -t vgg .'}
+                }
+            }
+        }
+        stage('Build and Start Services with Docker Compose') {
+            steps {
+                script {
+                        bat 'docker-compose up -d'
+                }
+            }
+        }
+
+        
 
         stage('Push Docker Images') {
             steps {
                 script {
                     
-                    if (isUnix()) {
-                        sh 'docker-compose push'
-                    } else {
                         bat 'docker-compose push'
-                    }
                 }
             }
         }
@@ -55,5 +59,4 @@ pipeline {
             }
         }
     }
-}
 }
