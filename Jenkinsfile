@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'windows' }
+    agent { label 'linux' }  // Utilise un agent avec le label 'linux'
 
     stages {
         stage('Checkout Code') {
@@ -13,7 +13,7 @@ pipeline {
             steps {
                 script {
                     dir('Frontend/my-angular-app') {
-                        bat 'docker build -t frontend .'
+                        sh 'docker build -t frontend .'  // Utilise sh au lieu de bat pour Linux
                     }
                 }
             }
@@ -23,7 +23,7 @@ pipeline {
             steps {
                 script {
                     dir('SVM') {
-                        bat 'docker build -t svm .'
+                        sh 'docker build -t svm .'  // Utilise sh au lieu de bat pour Linux
                     }
                 }
             }
@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     dir('vgg') {
-                        bat 'docker build -t vgg .'
+                        sh 'docker build -t vgg .'  // Utilise sh au lieu de bat pour Linux
                     }
                 }
             }
@@ -42,7 +42,7 @@ pipeline {
         stage('Build and Start Services with Docker Compose') {
             steps {
                 script {
-                    bat 'docker-compose up -d --build'
+                    sh 'docker-compose up -d --build'  // Utilise sh au lieu de bat pour Linux
                 }
             }
         }
@@ -50,7 +50,7 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 script {
-                    bat 'docker-compose push'
+                    sh 'docker-compose push'  // Utilise sh au lieu de bat pour Linux
                 }
             }
         }
@@ -58,7 +58,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying app...'
-                // Add your deploy logic here, e.g., deploy to a cloud or remote server
+                // Ajoutez votre logique de déploiement ici, par exemple, pour déployer sur un serveur cloud ou distant
             }
         }
     }
