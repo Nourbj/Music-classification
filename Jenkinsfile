@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'linux' }  // Utilise un agent avec le label 'linux'
+    agent { label 'controleur' }  // Utilisation du nœud Linux "controleur"
 
     stages {
         stage('Checkout Code') {
@@ -13,7 +13,8 @@ pipeline {
             steps {
                 script {
                     dir('Frontend/my-angular-app') {
-                        sh 'docker build -t frontend .'  // Utilise sh au lieu de bat pour Linux
+                        // Remplacement de bat par sh pour Linux
+                        sh 'docker build -t frontend .'
                     }
                 }
             }
@@ -23,7 +24,8 @@ pipeline {
             steps {
                 script {
                     dir('SVM') {
-                        sh 'docker build -t svm .'  // Utilise sh au lieu de bat pour Linux
+                        // Remplacement de bat par sh pour Linux
+                        sh 'docker build -t svm .'
                     }
                 }
             }
@@ -33,7 +35,8 @@ pipeline {
             steps {
                 script {
                     dir('vgg') {
-                        sh 'docker build -t vgg .'  // Utilise sh au lieu de bat pour Linux
+                        // Remplacement de bat par sh pour Linux
+                        sh 'docker build -t vgg .'
                     }
                 }
             }
@@ -42,7 +45,8 @@ pipeline {
         stage('Build and Start Services with Docker Compose') {
             steps {
                 script {
-                    sh 'docker-compose up -d --build'  // Utilise sh au lieu de bat pour Linux
+                    // Remplacement de bat par sh pour Linux
+                    sh 'docker-compose up -d --build'
                 }
             }
         }
@@ -50,7 +54,8 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 script {
-                    sh 'docker-compose push'  // Utilise sh au lieu de bat pour Linux
+                    // Remplacement de bat par sh pour Linux
+                    sh 'docker-compose push'
                 }
             }
         }
@@ -58,7 +63,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying app...'
-                // Ajoutez votre logique de déploiement ici, par exemple, pour déployer sur un serveur cloud ou distant
+                // Ajoutez votre logique de déploiement ici, par exemple, déployer sur un cloud ou un serveur distant
             }
         }
     }
