@@ -13,16 +13,19 @@ pipeline {
             steps {
                 script {
                     echo 'Checking Docker installation and environment...'
-                    // Check Docker and Docker Compose versions
                     if (isUnix()) {
                         sh '''
-                        docker --version || { echo "Docker not installed or not in PATH"; exit 1; }
-                        docker-compose --version || { echo "Docker Compose not installed or not in PATH"; exit 1; }
+                        if ! command -v docker >/dev/null 2>&1; then
+                            echo "Docker not installed or not in PATH"
+                            exit 1
+                        fi
                         '''
                     } else {
                         bat '''
-                        docker --version || exit /b 1
-                        docker-compose --version || exit /b 1
+                        where docker || (
+                            echo Docker not installed or not in PATH
+                            exit 1
+                        )
                         '''
                     }
                 }
@@ -33,17 +36,10 @@ pipeline {
             steps {
                 script {
                     echo 'Building and starting services with Docker Compose...'
-                    // Run docker-compose with error handling
                     if (isUnix()) {
-                        sh '''
-                        docker-compose -f docker-compose.yml up --build -d || { 
-                            echo "Docker Compose failed."; exit 1; 
-                        }
-                        '''
+                        sh 'docker-compose -f docker-compose.yml up --build -d'
                     } else {
-                        bat '''
-                        docker-compose -f docker-compose.yml up --build -d || exit /b 1
-                        '''
+                        bat 'docker-compose -f docker-compose.yml up --build -d'
                     }
                 }
             }
@@ -53,17 +49,10 @@ pipeline {
             steps {
                 script {
                     echo 'Pushing Docker images to registry...'
-                    // Push images to Docker registry
                     if (isUnix()) {
-                        sh '''
-                        docker-compose push || { 
-                            echo "Failed to push Docker images."; exit 1; 
-                        }
-                        '''
+                        sh 'docker-compose push'
                     } else {
-                        bat '''
-                        docker-compose push || exit /b 1
-                        '''
+                        bat 'docker-compose push'
                     }
                 }
             }
@@ -72,20 +61,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 echo 'Deploying the application...'
-                // Add deployment logic here
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline finished.'
-        }
-        success {
-            echo 'Pipeline completed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Please check the logs for more details.'
         }
     }
 }
