@@ -9,27 +9,40 @@ pipeline {
             }
         }
 
-        stage('Check Docker') {
+       stage('Build Frontend') {
             steps {
                 script {
-                    echo 'Checking Docker environment...'
-                    sh '''
-                    if ! command -v docker >/dev/null 2>&1; then
-                        echo "Docker not installed or not in PATH"
-                        exit 1
-                    else
-                        echo "Docker is installed"
-                    fi
-                    '''
+                    dir('Frontend/my-angular-app') {
+                        bat 'docker build -t frontend .'
+                    }
                 }
             }
         }
 
-        stage('Build and Start Docker Compose') {
+        stage('Build SVM') {
             steps {
                 script {
-                    echo 'Building and starting services with Docker Compose...'
-                    sh 'docker-compose -f docker-compose.yml up --build -d'
+                    dir('SVM') {
+                        bat 'docker build -t svm .'
+                    }
+                }
+            }
+        }
+
+        stage('Build VGG') {
+            steps {
+                script {
+                    dir('vgg') {
+                        bat 'docker build -t vgg .'
+                    }
+                }
+            }
+        }
+
+        stage('Build and Start Services with Docker Compose') {
+            steps {
+                script {
+                    bat 'docker-compose up -d --build'
                 }
             }
         }
@@ -37,16 +50,15 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 script {
-                    echo 'Pushing Docker images...'
-                    sh 'docker-compose push'
+                    bat 'docker-compose push'
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                echo 'Deploying the application...'
-                // Add your deployment logic here
+                echo 'Deploying app...'
+                // Add your deploy logic here, e.g., deploy to a cloud or remote server
             }
         }
     }
