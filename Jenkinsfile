@@ -1,5 +1,4 @@
 pipeline {
-    agent { label 'contrôleur' }  // Utilisation du nœud Linux "controleur"
 
     stages {
         stage('Checkout Code') {
@@ -13,7 +12,6 @@ pipeline {
             steps {
                 script {
                     dir('Frontend/my-angular-app') {
-                        // Remplacement de bat par sh pour Linux
                         sh 'docker build -t frontend .'
                     }
                 }
