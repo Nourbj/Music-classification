@@ -9,7 +9,7 @@ pipeline {
             }
         }
         
-        stage('Build frontend') {
+        stage('Build Frontend') {
             steps {
                 script {
                     dir('Frontend/my-angular-app') {
@@ -19,7 +19,7 @@ pipeline {
             }
         }
 
-        stage('Build SVM') {
+        stage('Build SVM Service') {
             steps {
                 script {
                     dir('SVM') {
@@ -29,7 +29,7 @@ pipeline {
             }
         }
 
-        stage('Build VGG') {
+        stage('Build VGG Service') {
             steps {
                 script {
                     dir('vgg') {
@@ -39,7 +39,7 @@ pipeline {
             }
         }
 
-        stage('Build and Start Services with Docker Compose') {
+        stage('Start Services with Docker Compose') {
             steps {
                 script {
                     bat 'docker-compose up -d'
@@ -50,16 +50,29 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 script {
+                    // Push Docker images to the registry
                     bat 'docker-compose push'
                 }
             }
         }
 
-        stage('Deploy') {
+        stage('Deploy Application') {
             steps {
                 echo 'Deploying app...'
-                // Add actual deploy steps here, e.g., pushing to a cloud platform or server
+                // Add deployment steps here
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline execution completed.'
+        }
+        success {
+            echo 'Build and deployment successful!'
+        }
+        failure {
+            echo 'Build failed! Investigate the issue.'
         }
     }
 }
