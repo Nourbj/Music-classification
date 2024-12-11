@@ -9,37 +9,26 @@ pipeline {
             }
         }
 
-        stage('Build and Start Services with Docker Compose') {
+        stage('Build Docker Images') {
             steps {
                 script {
-                    // Run docker-compose for Unix or Windows
-                    if (isUnix()) {
-                        sh 'docker-compose -f docker-compose.yml up --build -d'
-                    } else {
-                        bat 'docker-compose -f docker-compose.yml up --build -d'
-                    }
+                    bat 'docker-compose build'
                 }
             }
         }
-
-        stage('Push Docker Images') {
+        stage('Run Containers') {
             steps {
                 script {
-                    // Run docker-compose push for Unix or Windows
-                    if (isUnix()) {
-                        sh 'docker-compose push'
-                    } else {
-                        bat 'docker-compose push'
-                    }
+                    bat 'docker-compose up -d'
                 }
             }
         }
-
-        stage('Deploy') {
+        stage('Stop Containers') {
             steps {
-                echo 'Deploying app...'
-                // Add your deployment commands here, if necessary
+                script {
+                    bat 'docker-compose down'
+                }
             }
-        }
-    }
+        }
+    }
 }
