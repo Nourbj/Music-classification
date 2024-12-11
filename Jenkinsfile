@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'windows' }
 
     stages {
         stage('Checkout Code') {
@@ -9,7 +9,7 @@ pipeline {
             }
         }
 
-       stage('Build Frontend') {
+        stage('Build Frontend') {
             steps {
                 script {
                     dir('Frontend/my-angular-app') {
