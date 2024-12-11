@@ -2,77 +2,57 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout Code and Repository') {
+        stage('Checkout Code and repository') {
             steps {
                 echo 'Checking out repository...'
                 git branch: 'main', url: 'https://github.com/Nourbj/Music-classification.git'
             }
         }
-        
-        stage('Build Frontend') {
+
+        stage('Build and Start Services with Docker Compose') {
             steps {
                 script {
-                    dir('Frontend/my-angular-app') {
-                        bat 'docker build -t frontend .'
+                    
+                    if (isUnix()) {
+                        sh 'docker-compose -f docker-compose.yml up --build -d'
+                    } else {
+                        bat 'docker-compose -f docker-compose.yml up --build -d'
                     }
                 }
             }
         }
 
-        stage('Build SVM Service') {
-            steps {
-                script {
-                    dir('SVM') {
-                        bat 'docker build -t svm .'
-                    }
-                }
-            }
-        }
-
-        stage('Build VGG Service') {
-            steps {
-                script {
-                    dir('vgg') {
-                        bat 'docker build -t vgg .'
-                    }
-                }
-            }
-        }
-
-        stage('Start Services with Docker Compose') {
-            steps {
-                script {
-                    bat 'docker-compose up -d'
-                }
-            }
-        }
+        // stage('Run Tests') {
+        //     steps {
+        //         script {
+        //             // Run tests (e.g., inside the relevant service container)
+        //             if (isUnix()) {
+        //                 sh 'docker-compose exec <service_name> pytest tests/'
+        //             } else {
+        //                 bat 'docker-compose exec <service_name> pytest tests/'
+        //             }
+        //         }
+        //     }
+        // }
 
         stage('Push Docker Images') {
             steps {
                 script {
-                    // Push Docker images to the registry
-                    bat 'docker-compose push'
+                    
+                    if (isUnix()) {
+                        sh 'docker-compose push'
+                    } else {
+                        bat 'docker-compose push'
+                    }
                 }
             }
         }
 
-        stage('Deploy Application') {
+        stage('Deploy') {
             steps {
+                
                 echo 'Deploying app...'
-                // Add deployment steps here
             }
-        }
-    }
-
-    post {
-        always {
-            echo 'Pipeline execution completed.'
-        }
-        success {
-            echo 'Build and deployment successful!'
-        }
-        failure {
-            echo 'Build failed! Investigate the issue.'
-        }
-    }
+        }
+    }
 }
