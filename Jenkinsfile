@@ -12,19 +12,20 @@ pipeline {
         stage('Build and Start Services with Docker Compose') {
             steps {
                 script {
-                    
-                    
+                    // Run docker-compose for Unix or Windows
+                    if (isUnix()) {
+                        sh 'docker-compose -f docker-compose.yml up --build -d'
+                    } else {
                         bat 'docker-compose -f docker-compose.yml up --build -d'
                     }
                 }
             }
         }
 
-
         stage('Push Docker Images') {
             steps {
                 script {
-                    
+                    // Run docker-compose push for Unix or Windows
                     if (isUnix()) {
                         sh 'docker-compose push'
                     } else {
@@ -36,8 +37,9 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                
                 echo 'Deploying app...'
+                // Add your deployment commands here, if necessary
             }
-}}
+        }
+    }
 }
