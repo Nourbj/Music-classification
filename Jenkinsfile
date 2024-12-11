@@ -8,11 +8,13 @@ pipeline {
                 git branch: 'master', url: 'https://github.com/Nourbj/Music-classification.git'
             }
         }
+
         stage('Build frontend') {
             steps {
                 script {
-                    dir('Frontend/my-angular-app')
-                        {bat 'docker build -t frontend .'}
+                    dir('Frontend/my-angular-app') {
+                        bat 'docker build -t frontend . || exit 1'
+                    }
                 }
             }
         }
@@ -20,23 +22,27 @@ pipeline {
         stage('Build svm') {
             steps {
                 script {
-                    dir('sSVM')
-                        {bat 'docker build -t svm .'}
+                    dir('SVM') {
+                        bat 'docker build -t svm . || exit 1'
+                    }
                 }
             }
         }
+
         stage('Build vgg') {
             steps {
                 script {
-                    dir('vgg')
-                        {bat 'docker build -t vgg .'}
+                    dir('vgg') {
+                        bat 'docker build -t vgg . || exit 1'
+                    }
                 }
             }
         }
+
         stage('Build and Start Services with Docker Compose') {
             steps {
                 script {
-                        bat 'docker-compose up -d'
+                    bat 'docker-compose up -d || exit 1'
                 }
             }
         }
@@ -57,17 +63,29 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 script {
-                    
-                        bat 'docker-compose push'
+                    // Login to Docker if necessary
+                    bat 'docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD || exit 1'
+
+                    // Push images to the Docker registry
+                    bat 'docker-compose push || exit 1'
                 }
             }
         }
 
         stage('Deploy') {
             steps {
-                
                 echo 'Deploying app...'
+                // You can add actual deployment commands here (e.g., moving to production, deploying containers, etc.)
             }
+        }
+    }
+
+    post {
+        success {
+            echo 'Pipeline executed successfully!'
+        }
+        failure {
+            echo 'Pipeline execution failed.'
         }
     }
 }
