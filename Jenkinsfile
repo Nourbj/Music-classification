@@ -8,12 +8,16 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/Nourbj/Music-classification.git'
             }
         }
-        
+
         stage('Build frontend') {
             steps {
                 script {
                     dir('Frontend/my-angular-app') {
-                        bat 'docker build -t frontend .'
+                        if (isUnix()) {
+                            sh 'docker build -t frontend .'
+                        } else {
+                            bat 'docker build -t frontend .'
+                        }
                     }
                 }
             }
@@ -23,7 +27,11 @@ pipeline {
             steps {
                 script {
                     dir('SVM') {
-                        bat 'docker build -t svm .'
+                        if (isUnix()) {
+                            sh 'docker build -t svm .'
+                        } else {
+                            bat 'docker build -t svm .'
+                        }
                     }
                 }
             }
@@ -33,7 +41,11 @@ pipeline {
             steps {
                 script {
                     dir('vgg') {
-                        bat 'docker build -t vgg .'
+                        if (isUnix()) {
+                            sh 'docker build -t vgg .'
+                        } else {
+                            bat 'docker build -t vgg .'
+                        }
                     }
                 }
             }
@@ -42,7 +54,11 @@ pipeline {
         stage('Build and Start Services with Docker Compose') {
             steps {
                 script {
-                    bat 'docker-compose up -d'
+                    if (isUnix()) {
+                        sh 'docker-compose up -d'
+                    } else {
+                        bat 'docker-compose up -d'
+                    }
                 }
             }
         }
@@ -50,7 +66,11 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 script {
-                    bat 'docker-compose push'
+                    if (isUnix()) {
+                        sh 'docker-compose push'
+                    } else {
+                        bat 'docker-compose push'
+                    }
                 }
             }
         }
