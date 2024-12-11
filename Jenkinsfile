@@ -12,10 +12,7 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 script {
-                    echo 'Building Docker Images'
-                    // Ensure docker-compose command works on Windows
-                    bat 'docker-compose --version' // To check if docker-compose is available
-                    bat 'docker-compose build'
+                    sh 'docker-compose build'
                 }
             }
         }
@@ -23,8 +20,7 @@ pipeline {
         stage('Run Containers') {
             steps {
                 script {
-                    echo 'Running Containers'
-                    bat 'docker-compose up -d'
+                    sh 'docker-compose up -d'
                 }
             }
         }
@@ -32,8 +28,7 @@ pipeline {
         stage('Stop Containers') {
             steps {
                 script {
-                    echo 'Stopping Containers'
-                    bat 'docker-compose down'
+                    sh 'docker-compose down'
                 }
             }
         }
